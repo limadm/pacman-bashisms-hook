@@ -1,0 +1,18 @@
+#!/bin/sh
+# Replaces hashbang shell in /usr/bin scripts
+# so I can use dash as my default shell.
+# Let's find some bash scripts in /usr/bin/* given by pacman:
+while read -r f; do
+	if file $f | grep -q 'shell script'; then
+		echo checking bashisms in $f...
+		checkbashisms $f >/dev/null 2>&1
+		# and adjust hashbang:
+		# when BASH,  use bin/bash
+		# when POSIX, use bin/sh
+		# otherwise, no changes.
+		case $? in
+			1) sed -i '1 s:/sh:/bash:' $f;;
+			4) sed -i '1 s:/bash:/sh:' $f;;
+		esac
+	fi
+done
